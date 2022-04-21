@@ -21,7 +21,8 @@ db.once("open", function() {
 });
 
 const UserSchema = new mongoose.Schema({
-    name: {type: String,}, email: {type: String}, password: {type: String}
+    name: {type: String,}, email: {type: String}, password: {type: String},
+    registrTime: {type: String}, lastLoginTime: {type: String}, status: {type: String}
 });
 
 const User = mongoose.model('userSchema', UserSchema)
@@ -43,6 +44,18 @@ app.post("/login_user", async (request, response) => {
 
     response.json({ user: user})
 });
+
+app.post("/delete_user", async (request, res) => {
+    const {_id} = request.body;
+
+    User.findByIdAndRemove(_id, (err) => {
+        if (!err) {
+        } else {
+            console.log('Failed to Delete user Details: ' + err);
+        }
+    });
+});
+
 
 app.get("/users", async (request, response) => {
     const users = await User.find({});

@@ -3,7 +3,6 @@ import {Button, TextField} from "@mui/material";
 // @ts-ignore
 import React from "react";
 import * as yup from "yup";
-import axios from "axios";
 
 function LogIn(props)  {
     const validationSchema = yup.object({username: yup.string().required(), password: yup.string().required()});

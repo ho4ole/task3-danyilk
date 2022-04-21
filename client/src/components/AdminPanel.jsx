@@ -3,13 +3,21 @@ import {Button} from "@mui/material";
 import React from "react";
 import {connect} from "react-redux";
 import {logInUser, signUpUser} from "../redux/auth-reducer";
+import TableComponent from "./TableComponent";
+import {deleteUser} from "../redux/users-reducer";
 // @ts-ignore
-function AuthHandler(props) {
+function AdminPanel(props) {
+
+    let deleteUserHandler = () => {
+       props.selectedUsers.forEach(userId => {props.deleteUser(userId)})
+    }
+
     return (<div>
-           <h1>Admin Panel</h1>
+           <Button onClick={deleteUserHandler}>Delete</Button>
+           <TableComponent/>
     </div>)
 }
 
-const mapStateToProps = (state) => {return {isAuth: state.auth.isAuth}}
+const mapStateToProps = (state) => {return {isAuth: state.auth.isAuth, selectedUsers: state.users.selectedUsers}}
 
-export default connect(mapStateToProps, {signUpUser, logInUser})(AuthHandler)
+export default connect(mapStateToProps, {signUpUser, logInUser, deleteUser})(AdminPanel)
