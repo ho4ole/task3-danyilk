@@ -1,18 +1,25 @@
-import {Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import {
+    Button,
+    Paper,
+    styled,
+    Table,
+    TableBody,
+    TableCell,
+    tableCellClasses,
+    TableContainer,
+    TableHead,
+    TableRow
+} from "@mui/material";
 import Checkbox from '@mui/material/Checkbox';
 // @ts-ignore
 import React, {useEffect, useRef, useState} from "react";
 import {connect} from "react-redux";
-import {checkAllUsers, checkUser, getUsers, unCheckAllUsers, unCheckUser} from "../redux/users-reducer";
+import {checkAllUsers, selectUser, getUsers, unCheckAllUsers, unCheckUser} from "../redux/users-reducer";
 // @ts-ignore
-const TableComponent = React.memo(props => {
-
-    const [users] = useState(0);
-    const prevUserstRef = useRef();
+const TableComponent = React.memo((props) => {
     useEffect(() => {
         props.getUsers();
-        prevUserstRef.current = users;
-    }, [users]);
+    }, [props.selectedUsers]);
 
     const handleClick = e => {
         const { id, checked } = e.target;
@@ -26,34 +33,58 @@ const TableComponent = React.memo(props => {
         else {props.unCheckAllUsers()}
     };
 
+    const StyledTableCell = styled(TableCell)(({ theme }) => ({
+        [`&.${tableCellClasses.head}`]: {
+            backgroundColor: theme.palette.common.black,
+            color: theme.palette.common.white,
+        },
+        [`&.${tableCellClasses.body}`]: {
+            fontSize: 14,
+        },
+    }));
+
+    const StyledTableRow = styled(TableRow)(({ theme }) => ({
+        '&:nth-of-type(odd)': {
+            backgroundColor: theme.palette.action.hover,
+        },
+        // hide last border
+        '&:last-child td, &:last-child th': {
+            border: 0,
+        },
+    }));
+
 
     return (<div>
-        <TableContainer>
+        <TableContainer component={Paper}>
             <Table  aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <Checkbox onChange={handleAllClick} id="selectAll"></Checkbox>
-                        <TableCell>User Id</TableCell>
-                        <TableCell align="right">User Name</TableCell>
-                        <TableCell align="right">Email</TableCell>
-                        <TableCell align="right">Password</TableCell>
-                        <TableCell align="right">Last login Time</TableCell>
-                        <TableCell align="right">Register Time</TableCell>
-                        <TableCell align="right">Status</TableCell>
+                        <td>
+                            <Checkbox onChange={handleAllClick}/>
+                        </td>
+                        <StyledTableCell>User Id</StyledTableCell>
+                        <StyledTableCell align="right">User Name</StyledTableCell>
+                        <StyledTableCell align="right">Email</StyledTableCell>
+                        <StyledTableCell align="right">Password</StyledTableCell>
+                        <StyledTableCell align="right">Last login Time</StyledTableCell>
+                        <StyledTableCell align="right">Register Time</StyledTableCell>
+                        <StyledTableCell align="right">Status</StyledTableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {props.users.map((user) => (
-                        <TableRow key={user._id}>
-                            <Checkbox checked={props.selectedUsers.includes(user._id)} name={user.name} onChange={handleClick} id={user._id}/>
-                            <TableCell component="th" scope="row">{user._id}</TableCell>
-                            <TableCell align="right">{user.name}</TableCell>
-                            <TableCell align="right">{user.email}</TableCell>
-                            <TableCell align="right">{user.password}</TableCell>
-                           {/* <TableCell align="right">{user.password}</TableCell>*/}
-                            <TableCell align="right">{user.registrTime}</TableCell>
-                            <TableCell align="right">{user.status}</TableCell>
-                        </TableRow>
+                        <StyledTableRow key={user._id}>
+                            <td>
+                                <Checkbox value={user._id} id={user._id} checked={props.selectedUsers.includes(user._id)} onChange={handleClick}/>
+                            </td>
+                            <StyledTableCell component="th" scope="row">{user._id}</StyledTableCell>
+                            <StyledTableCell align="right">{user.name}</StyledTableCell>
+                            <StyledTableCell align="right">{user.email}</StyledTableCell>
+                            <StyledTableCell align="right">{user.password}</StyledTableCell>
+                           <StyledTableCell align="right">{user.lastLoginTime}</StyledTableCell>
+                            <StyledTableCell align="right">{user.registrTime}</StyledTableCell>
+                            <StyledTableCell align="right">{user.status}</StyledTableCell>
+                        </StyledTableRow>
                     ))}
                 </TableBody>
             </Table>
@@ -62,4 +93,4 @@ const TableComponent = React.memo(props => {
 })
 const mapStateToProps = (state) => {return {users: state.users.users, selectedUsers: state.users.selectedUsers}}
 
-export default connect(mapStateToProps, {getUsers, checkUser, unCheckUser, checkAllUsers, unCheckAllUsers})(React.memo(TableComponent))
+export default connect(mapStateToProps, {getUsers, checkUser: selectUser, unCheckUser, checkAllUsers, unCheckAllUsers})(React.memo(TableComponent))

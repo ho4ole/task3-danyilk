@@ -1,4 +1,5 @@
-import {deleteUserRequest, makeUsersRequest} from "../api/Api";
+import {blockUserRequest, deleteUserRequest, makeUsersRequest, unBlockUserRequest} from "../api/Api";
+import {changeAuth} from "./auth-reducer";
 
 const SET_USERS = "SET_USERS"
 const CHECK_ALL_USERS = "CHECK_ALL_USERS"
@@ -50,7 +51,7 @@ export const getUsers = () => async (dispatch) => {
     })
 }
 
-export const checkUser = (data) => async (dispatch) => {
+export const selectUser = (data) => async (dispatch) => {
     dispatch(setUpCheckedUser(data));
 }
 
@@ -66,12 +67,29 @@ export const unCheckAllUsers = () => async (dispatch) => {
     dispatch(setUpUnCheckedAllUsers());
 }
 
-export const deleteUser = (data) => async (dispatch) => {
-    deleteUserRequest(data).then(res => {});
+export const deleteUser = (data, userId) => async (dispatch) => {
+    let checkedUsers = [...data];
+    checkedUsers.forEach(user => {(deleteUserRequest(user))})
+    if(checkedUsers.includes(userId)) {dispatch(changeAuth(false))};
+    dispatch(setUpUnCheckedAllUsers());
+}
+
+export const blockUser = (data, userId) => async (dispatch) => {
+    let checkedUsers = [...data];
+    checkedUsers.forEach(user => {(blockUserRequest(user))})
+    if(checkedUsers.includes(userId)) {dispatch(changeAuth(false))};
+    dispatch(setUpUnCheckedAllUsers());
+}
+
+export const unBlockUser = (data) => async (dispatch) => {
+    let checkedUsers = [...data];
+    checkedUsers.forEach(user => {unBlockUserRequest(user)})
     makeUsersRequest().then(res => {
-        dispatch(setUpUsers(res))
+        dispatch(setUpUsers(res));
+        dispatch(setUpUnCheckedUser(data));
     })
 }
+
 
 
 export default usersReducer;
